@@ -22,19 +22,7 @@
         // Initialize characters array
         let characters = [];
 
-        // Reset each character to their original state (hp and attack) and create new cards
-        function reset() {
-            // Decalring a new object for each character
-            //     Create new characters here
-            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 8, 20);
-            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 120, 8, 20);
-            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 120, 8, 20);
-            let darthMaul = new Character("darth-maul", "Darth Maul", 120, 8, 20);
-
-            // Array of characters
-            //     Add new characters here
-            characters = [obiwanKenobi, lukeSkywalker, darthSiduous, darthMaul];
-
+        function createCards() {
             // Create a card for each character
             for (let i = 0; i < characters.length; i++) {
 
@@ -166,24 +154,66 @@
             alert();
         }
 
-        reset();
+        // Set up initial on click event for the character cards
+        function setInitialOnClick() {
+            // When a character is first clicked
+            $(".choose-character").on("click", function() {
+                chooseCharacter(this);
 
-        // When a character is first clicked
-        $(".choose-character").on("click", function() {
-            chooseCharacter(this);
+                // When an enemy is clicked
+                $(".choose-enemy").on("click", function() {
+                    chooseEnemy(this);
 
-            // When an enemy is clicked
-            $(".choose-enemy").on("click", function() {
-                chooseEnemy(this);
+                    // Enables the attack button
+                    $("#attack").attr("disabled", false);
 
-                // Enables the attack button
-                $("#attack").attr("disabled", false);
-
-                // When the attack button is clicked
-                $("#attack").on("click", function() {
-                    attack();
+                    // When the attack button is clicked
+                    $("#attack").on("click", function() {
+                        attack();
+                        $("#restart").removeClass("hidden");  // PLACE SOMEWHERE ELSE IN THE FUTURE
+                    });
                 });
             });
-        });
+        }  
+
+        // Reset each character to their original state (hp and attack) and create new cards,
+        //     and clear all the cards in the divs
+        function restart() {
+            // Decalring a new object for each character
+            //     Create new characters here
+            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 8, 20);
+            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 120, 8, 20);
+            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 120, 8, 20);
+            let darthMaul = new Character("darth-maul", "Darth Maul", 120, 8, 20);
+
+            // Array of characters
+            //     Add new characters here
+            characters = [obiwanKenobi, lukeSkywalker, darthSiduous, darthMaul];
+
+            // Create cards for each of the characters
+            createCards()
+
+            // Empty all divs with cards
+            $("#your-character").empty();
+            $("#enemies").empty();
+            $("#defender").empty();
+
+            // Disables the attack button
+            $("#attack").attr("disabled", true);
+
+            // Hides restart button
+            $("#restart").addClass("hidden");
+
+            setInitialOnClick();
+        }
+
+        // Set up new game
+        restart();
+
+        // When the restart button is clicked
+        $("#restart").on("click", function() {
+            // Restart a new game
+            restart();
+        })
     })
 })();
