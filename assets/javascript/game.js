@@ -16,6 +16,7 @@
             this.name = name;
             this.hp = hp;
             this.attack = attack;
+            this.startingAttack = attack;
             this.counter = counter;
         }
 
@@ -143,7 +144,7 @@
                     // Add to defender div
                     $("#defender").append(oneEnemy);
                     // Add class to defender
-                    oneEnemy.addClass("defender");
+                    // oneEnemy.attr("id", "current-defender");       IS THIS NECESSARY?
                     // Change background color to black
                     oneEnemy.addClass("text-white bg-dark");
                 }
@@ -151,9 +152,61 @@
         }
 
         function attack () {
-            alert();
+            // Get name of your character
+            let yourCharacterName = $("#your-character h5")[0].textContent;
+            // Get name of your defender
+            let defenderName = $("#defender h5")[0].textContent;
+
+            // Index of your character
+            let yourCharacterIndex;
+            // Index of defender
+            let defenderIndex;
+
+            // Iterate through all characters to find the index of your character and defender
+            for (let i = 0; i < characters.length; i++) {
+                // If the current character is your character
+                if (characters[i].name === yourCharacterName) {
+                    yourCharacterIndex = i;
+                // If the current character is the defender
+                } else if (characters[i].name === defenderName) {
+                    defenderIndex = i;
+                }
+            }
+
+            // Get object of your character
+            let yourCharacterObj = characters[yourCharacterIndex];
+            // Get object of defender
+            let defenderObj = characters[defenderIndex];
+
+            console.log("Before attack:")
+            console.log(yourCharacterObj);
+            console.log(defenderObj);
+            console.log("");
+
+            // Your character's attack
+            defenderObj.hp -= yourCharacterObj.attack;
+            yourCharacterObj.attack += yourCharacterObj.startingAttack;
+            // Defender's attack
+            yourCharacterObj.hp -= defenderObj.counter;
+
+            console.log("After attack:")
+            console.log(yourCharacterObj);
+            console.log(defenderObj);
+
+            updateDisplay(yourCharacterObj, defenderObj);
         }
 
+        // Update the display
+        function updateDisplay(yourCharacterObj, defenderObj) {
+            // Update your character HP
+            $("#your-character span")[0].textContent = yourCharacterObj.hp;
+            // Update defender HP
+            $("#defender span")[0].textContent = defenderObj.hp;
+
+            // Update the attack log
+            $("#your-character-attack").text("You attacked " + defenderObj.name + " for " + (yourCharacterObj.attack - yourCharacterObj.startingAttack) + " damage.");
+            $("#defender-attack").text(defenderObj.name + " attacked you for " + defenderObj.counter + " damage.");
+        }
         // Set up initial on click event for the character cards
         function setInitialOnClick() {
             // When a character is first clicked
@@ -170,7 +223,13 @@
                     // When the attack button is clicked
                     $("#attack").on("click", function() {
                         attack();
+
+
+                        // Disables the attack button         // PLACE SOMEWHERE ELSE IN THE FUTURE
+                        // $("#attack").attr("disabled", true);  // PLACE SOMEWHERE ELSE IN THE FUTURE
                         $("#restart").removeClass("hidden");  // PLACE SOMEWHERE ELSE IN THE FUTURE
+
+
                     });
                 });
             });
@@ -181,10 +240,10 @@
         function restart() {
             // Decalring a new object for each character
             //     Create new characters here
-            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 8, 20);
-            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 120, 8, 20);
-            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 120, 8, 20);
-            let darthMaul = new Character("darth-maul", "Darth Maul", 120, 8, 20);
+            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 8, 10);
+            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 100, 10, 5);
+            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 150, 6, 20);
+            let darthMaul = new Character("darth-maul", "Darth Maul", 180, 4, 25);
 
             // Array of characters
             //     Add new characters here
