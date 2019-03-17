@@ -185,28 +185,59 @@
 
             // Your character's attack
             defenderObj.hp -= yourCharacterObj.attack;
+            // Your character's attack increases
             yourCharacterObj.attack += yourCharacterObj.startingAttack;
-            // Defender's attack
-            yourCharacterObj.hp -= defenderObj.counter;
+
+            // Check if defender is dead
+            let isDefenderDead = defenderObj.hp <= 0;;
+
+            // If the defender's is not dead after your character's attack
+            if (!isDefenderDead) {
+                // Defender's attack
+                yourCharacterObj.hp -= defenderObj.counter;
+            }
+
+            // Check if your character is dead
+            let isYourCharacterDead = yourCharacterObj.hp <= 0;
+
+            updateDisplay(yourCharacterObj, isYourCharacterDead, defenderObj, isDefenderDead);
 
             console.log("After attack:")
             console.log(yourCharacterObj);
             console.log(defenderObj);
-
-            updateDisplay(yourCharacterObj, defenderObj);
         }
 
         // Update the display
-        function updateDisplay(yourCharacterObj, defenderObj) {
+        function updateDisplay(yourCharacterObj, isYourCharacterDead, defenderObj, isDefenderDead) {
             // Update your character HP
             $("#your-character span")[0].textContent = yourCharacterObj.hp;
             // Update defender HP
             $("#defender span")[0].textContent = defenderObj.hp;
 
-            // Update the attack log
-            $("#your-character-attack").text("You attacked " + defenderObj.name + " for " + (yourCharacterObj.attack - yourCharacterObj.startingAttack) + " damage.");
-            $("#defender-attack").text(defenderObj.name + " attacked you for " + defenderObj.counter + " damage.");
+            // If the defender is dead
+            if (isDefenderDead) {
+                // Update the attack log
+                $("#defender-attack").empty();
+                $("#your-character-attack").text("You have defeated " + defenderObj.name + ", you can choose to fight another enemy.");
+                // Disable the attack button
+                $("#attack").attr("disabled", true);
+            // If your character is dead
+            } else if (isYourCharacterDead) {
+                // Update the attack log
+                $("#your-character-attack").empty();
+                $("#defender-attack").text("You have been defeated... GAME OVER!");
+                // Disable the attack button
+                $("#attack").attr("disabled", true);
+                // Show the restart button
+                $("#restart").removeClass("hidden");
+            // If defender and your character is still alive
+            } else {  // (!isDefenderDead && !isYourCharacterDead)
+                // Update the attack log
+                $("#your-character-attack").text("You attacked " + defenderObj.name + " for " + (yourCharacterObj.attack - yourCharacterObj.startingAttack) + " damage.");
+                $("#defender-attack").text(defenderObj.name + " attacked you for " + defenderObj.counter + " damage.");
+            }
         }
+        
         // Set up initial on click event for the character cards
         function setInitialOnClick() {
             // When a character is first clicked
@@ -225,9 +256,7 @@
                         attack();
 
 
-                        // Disables the attack button         // PLACE SOMEWHERE ELSE IN THE FUTURE
-                        // $("#attack").attr("disabled", true);  // PLACE SOMEWHERE ELSE IN THE FUTURE
-                        $("#restart").removeClass("hidden");  // PLACE SOMEWHERE ELSE IN THE FUTURE
+                        
 
 
                     });
@@ -257,11 +286,15 @@
             $("#enemies").empty();
             $("#defender").empty();
 
-            // Disables the attack button
+            // Disable the attack button
             $("#attack").attr("disabled", true);
 
-            // Hides restart button
+            // Hide the restart button
             $("#restart").addClass("hidden");
+
+            // Clear the attack log
+            $("#your-character-attack").empty();
+            $("#defender-attack").empty();
 
             setInitialOnClick();
         }
