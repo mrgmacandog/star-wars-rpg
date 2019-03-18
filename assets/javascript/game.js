@@ -1,13 +1,13 @@
+// Code is executed in strict mode
 "use strict";
 
-// 1. Choose a character
-// 2. Move the chosen character to your character
-// 3. Move the other characters to the enemies available to attack
-// 4. Choose a defender from the list of enemies
-
+// Wrap all code in an anonymous function so functions cannot be called externally
 (function() {
     // Run JavaScript once the document is ready
     $(document).ready(function() {
+
+        // Initialize characters array
+        let characters = [];
 
         // Character constructor
         //     Takes in a name, hp, attack, and counter
@@ -20,8 +20,51 @@
             this.counter = counter;
         }
 
-        // Initialize characters array
-        let characters = [];
+        // Reset each character to their original state (hp and attack) and create new cards,
+        //     and clear all the cards in the divs
+        function restart() {
+            // Decalring a new object for each character
+            //     Create new characters here
+            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 16, 15);
+            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 100, 22, 10);
+            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 150, 10, 25);
+            let darthMaul = new Character("darth-maul", "Darth Maul", 180, 4, 30);
+
+            // Array of characters
+            //     Add new characters here
+            characters = [obiwanKenobi, lukeSkywalker, darthSiduous, darthMaul];
+
+            // Create cards for each of the characters
+            createCards()
+
+            // Empty all divs with cards
+            $("#your-character").empty();
+            $("#enemies").empty();
+            $("#defender").empty();
+
+            // Disable the attack button
+            $("#attack").attr("disabled", true);
+
+            // Hide the restart button
+            $("#restart").addClass("hidden");
+
+            // Clear the attack log
+            $("#your-character-attack").empty();
+            $("#defender-attack").empty();
+
+            // Unhide "Choose Your Character"
+            $("#choose-character-text").removeClass("hidden");
+
+            // Hide proper divs
+            $("#choose-enemy-text").addClass("hidden");
+            $("#your-character-text").addClass("hidden");
+            $("#defender-text").addClass("hidden");
+            $("#fight-section-text").addClass("hidden");
+            $("#attack-btn").addClass("hidden");
+
+            // Set ability to click a character and make it your character
+            setCharacterOnClick();
+        }
 
         function createCards() {
             // Create a card for each character
@@ -79,10 +122,29 @@
                 $("#characters").append(column);
             }
         }
+        
+        // Set up initial on click event for the choosing a character
+        function setCharacterOnClick() {
+            // When a character is first clicked
+            $(".choose-character").on("click", function() {
+                // Hide "Choose Your Character"
+                $("#choose-character-text").addClass("hidden");
+
+                // Make the clicked character your character
+                chooseCharacter(this);
+
+                // Set ability to click an enemy and make the defender
+                setEnemyOnCLick();
+            });
+        }
 
         // Make a character choice
         //     Takes in the character clicked
         function chooseCharacter(chosenCharacter) {
+            // Unhide proper divs
+            $("#choose-enemy-text").removeClass("hidden");
+            $("#your-character-text").removeClass("hidden");
+
             // Assign all characters to a variable
             let chooseCharacter = $(".choose-character");
             
@@ -104,6 +166,10 @@
                 if (chooseCharacter[i] === chosenCharacter) {
                     // Add to your-character div
                     $("#your-character").append(oneCharacter);
+
+                    // Change column size due to #your-character div being inside a col-md-6 div
+                    oneCharacter.removeClass("col-md-3");
+                    oneCharacter.addClass("col-md-6");
                 // Current character is not the character clicked
                 } else {  // (chooseCharacter[i] !== chosenCharacter)
                     // Add to enemies div
@@ -119,36 +185,74 @@
             } 
         }
 
+        // Set up on click event for choosing an enemy
+        function setEnemyOnCLick() {
+            // When this is called after a defender is defeated, that defender still has
+            //     the on click event from when this function was declared.
+            // To remedy that, the defeated defender needs it's on click event removed.
+            $("#defender > div").off("click");
+
+            // When an enemy is clicked
+            $(".choose-enemy").on("click", function() {
+                // Remove defeated defender
+                $("#defender").empty();
+                // Empty attack log when a new enemy is chosen
+                $("#your-character-attack").empty();
+
+                // Make the clicked enemy the defender
+                chooseEnemy(this);
+
+                // Enables the attack button
+                $("#attack").attr("disabled", false);
+
+                // Remove previous on click event (if there is one)
+                $("#attack").off("click");   
+
+                // When the attack button is clicked
+                $("#attack").on("click", function() {
+                    // Make an attack
+                    attack();
+                });
+            });
+        }
+
         // Make an enemy choice
         //     Takes in the enemy clicked
         function chooseEnemy(chosenEnemy) {
+            // Unhide proper divs
+            $("#defender-text").removeClass("hidden");
+            $("#fight-section-text").removeClass("hidden");
+            $("#attack-btn").removeClass("hidden");
 
-            // POSSIBLY MOVE THIS OUTSIDE OF FOR LOOP
-            // If the current enemy is the enemy clicked
+            // Set chosenEnemy do a jQuery element
             chosenEnemy = $(chosenEnemy);
+
             // Remove the enemy card from the DOM
             chosenEnemy.detach();
+            
             // Add to defender div
             $("#defender").append(chosenEnemy);
+
             // Remove choose-enemy class
             chosenEnemy.removeClass("choose-enemy");
+
             // Change background color to black
             chosenEnemy.addClass("text-white bg-dark");
 
+            // Change column size due to #defender div being inside a col-md-6 div
+            chosenEnemy.removeClass("col-md-3");
+            chosenEnemy.addClass("col-md-6");
 
             // Assign all enemies to a variable
             let chooseEnemy = $(".choose-enemy");
 
             // Move clicked enemy to the defender section and change the colors
             for (let i = 0; i < chooseEnemy.length; i++) {
-
                 // Assign current enemy to variable
                 let oneEnemy = $(chooseEnemy[i]);
                 
                 // Remove the click event handlers for all characters
                 oneEnemy.off("click");       
-
-                
             }
         }
 
@@ -167,9 +271,11 @@
             for (let i = 0; i < characters.length; i++) {
                 // If the current character is your character
                 if (characters[i].name === yourCharacterName) {
+                    // Set your character's index
                     yourCharacterIndex = i;
                 // If the current character is the defender
                 } else if (characters[i].name === defenderName) {
+                    // Set defender's index
                     defenderIndex = i;
                 }
             }
@@ -201,6 +307,7 @@
             // Check if your character is dead
             let isYourCharacterDead = yourCharacterObj.hp <= 0;
 
+            // Update the display includding your character, defender, and attack log
             updateDisplay(yourCharacterObj, isYourCharacterDead, defenderObj, isDefenderDead);
 
             console.log("After attack:")
@@ -244,81 +351,6 @@
                 $("#your-character-attack").text("You attacked " + defenderObj.name + " for " + (yourCharacterObj.attack - yourCharacterObj.startingAttack) + " damage.");
                 $("#defender-attack").text(defenderObj.name + " attacked you for " + defenderObj.counter + " damage.");
             }
-        }
-        
-        // Set up initial on click event for the choosing a character
-        function setCharacterOnClick() {
-            // When a character is first clicked
-            $(".choose-character").on("click", function() {
-                chooseCharacter(this);
-
-                setEnemyOnCLick();
-            });
-        }
-
-        // Set up on click event for choosing an enemy
-        function setEnemyOnCLick() {
-            // When this is called after a defender is defeated, that defender still has
-            //     the on click event from when this function was declared.
-            // To remedy that, the defeated defender needs it's on click event removed.
-            $("#defender > div").off("click");
-
-            // When an enemy is clicked
-            $(".choose-enemy").on("click", function() {
-                // Remove defeated defender
-                $("#defender").empty();
-                // Empty attack log when a new enemy is chosen
-                $("#your-character-attack").empty();
-
-                // Make an enemy the defender
-                chooseEnemy(this);
-
-                // Enables the attack button
-                $("#attack").attr("disabled", false);
-
-                // Remove previous on click event (if there is one)
-                $("#attack").off("click");   
-
-                // When the attack button is clicked
-                $("#attack").on("click", function() {
-                    attack();
-                });
-            });
-        }
-
-        // Reset each character to their original state (hp and attack) and create new cards,
-        //     and clear all the cards in the divs
-        function restart() {
-            // Decalring a new object for each character
-            //     Create new characters here
-            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 16, 15);
-            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 100, 22, 10);
-            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 150, 10, 25);
-            let darthMaul = new Character("darth-maul", "Darth Maul", 180, 4, 30);
-
-            // Array of characters
-            //     Add new characters here
-            characters = [obiwanKenobi, lukeSkywalker, darthSiduous, darthMaul];
-
-            // Create cards for each of the characters
-            createCards()
-
-            // Empty all divs with cards
-            $("#your-character").empty();
-            $("#enemies").empty();
-            $("#defender").empty();
-
-            // Disable the attack button
-            $("#attack").attr("disabled", true);
-
-            // Hide the restart button
-            $("#restart").addClass("hidden");
-
-            // Clear the attack log
-            $("#your-character-attack").empty();
-            $("#defender-attack").empty();
-
-            setCharacterOnClick();
         }
 
         // Set up new game
