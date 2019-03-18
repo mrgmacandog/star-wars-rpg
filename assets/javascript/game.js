@@ -127,23 +127,28 @@
         function setCharacterOnClick() {
             // When a character is first clicked
             $(".choose-character").on("click", function() {
-                // Hide "Choose Your Character"
-                $("#choose-character-text").addClass("hidden");
-
-                // Make the clicked character your character
-                chooseCharacter(this);
-
-                // Set ability to click an enemy and make the defender
-                setEnemyOnCLick();
+                // Fade out the character clicked
+                $(this).fadeOut(500, function() {
+                    // Make the clicked character your character
+                    chooseCharacter(this);
+                    // Set ability to click an enemy and make the defender
+                    setEnemyOnClick();
+                });
             });
         }
 
         // Make a character choice
         //     Takes in the character clicked
         function chooseCharacter(chosenCharacter) {
+            // Hide "Choose Your Character"
+            $("#choose-character-text").addClass("hidden");
+
             // Unhide proper divs
             $("#choose-enemy-text").removeClass("hidden");
             $("#your-character-text").removeClass("hidden");
+
+            // Fade in the chosen character in the your character section
+            $(chosenCharacter).fadeIn(500);
 
             // Assign all characters to a variable
             let chooseCharacter = $(".choose-character");
@@ -186,21 +191,23 @@
         }
 
         // Set up on click event for choosing an enemy
-        function setEnemyOnCLick() {
-            // When this is called after a defender is defeated, that defender still has
-            //     the on click event from when this function was declared.
-            // To remedy that, the defeated defender needs it's on click event removed.
-            $("#defender > div").off("click");
-
+        function setEnemyOnClick() {
             // When an enemy is clicked
             $(".choose-enemy").on("click", function() {
-                // Remove defeated defender
-                $("#defender").empty();
+                // Fade out the previosly defeated enemy
+                $("#defender > div").fadeOut(500, function(){
+                    // Remove defeated defender
+                    $("#defender").empty();
+                })
+                
                 // Empty attack log when a new enemy is chosen
                 $("#your-character-attack").empty();
 
-                // Make the clicked enemy the defender
-                chooseEnemy(this);
+                // Fade out the chosen enemy
+                $(this).fadeOut(500, function() {
+                    // Make the clicked enemy the defender
+                    chooseEnemy(this);
+                });
 
                 // Enables the attack button
                 $("#attack").attr("disabled", false);
@@ -233,6 +240,9 @@
             // Add to defender div
             $("#defender").append(chosenEnemy);
 
+            // Fade in the
+            chosenEnemy.fadeIn(500);
+
             // Remove choose-enemy class
             chosenEnemy.removeClass("choose-enemy");
 
@@ -242,6 +252,9 @@
             // Change column size due to #defender div being inside a col-md-6 div
             chosenEnemy.removeClass("col-md-3");
             chosenEnemy.addClass("col-md-6");
+
+            // Remove on click for chosen defender
+            chosenEnemy.off("click");
 
             // Assign all enemies to a variable
             let chooseEnemy = $(".choose-enemy");
@@ -331,13 +344,15 @@
                 // Disable the attack button
                 $("#attack").attr("disabled", true);
 
+                // When the last defender is defeated
                 if ($("#enemies > .choose-enemy").length > 0) {
                     // Update the attack log
                     $("#your-character-attack").text("You have defeated " + defenderObj.name +
                                                      ", you can choose to fight another enemy.");
 
                     // Enable enemies to be selected as a defender
-                    setEnemyOnCLick();
+                    setEnemyOnClick();
+                // When a defender that is not the last defender is defeated
                 } else {
                     // Update the attack log
                     $("#your-character-attack").text("Congratulations, " + yourCharacterObj.name +
