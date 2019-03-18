@@ -324,16 +324,33 @@
 
             // If the defender is dead
             if (isDefenderDead) {
-                // Update the attack log
-                $("#defender-attack").empty();
-                $("#your-character-attack").text("You have defeated " + defenderObj.name + ", you can choose to fight another enemy.");
                 
+                // Empty defender's attack log
+                $("#defender-attack").empty();
+
                 // Disable the attack button
                 $("#attack").attr("disabled", true);
 
-                // Enable enemies to be selected as a defender
-                setEnemyOnCLick();
-                
+                if ($("#enemies > .choose-enemy").length > 0) {
+                    // Update the attack log
+                    $("#your-character-attack").text("You have defeated " + defenderObj.name +
+                                                     ", you can choose to fight another enemy.");
+
+                    // Enable enemies to be selected as a defender
+                    setEnemyOnCLick();
+                } else {
+                    // Update the attack log
+                    $("#your-character-attack").text("Congratulations, " + yourCharacterObj.name +
+                                                     "! Defeating " + defenderObj.name +
+                                                     " was the last step to total victory. " +
+                                                     "Click the \"Restart\" button to play again.");
+                    
+                    // Show the restart button
+                    $("#restart").removeClass("hidden");
+
+                    // Remove on click event for last defender
+                    $("#defender > div").off("click");
+                }
             // If your character is dead
             } else if (isYourCharacterDead) {
                 // Update the attack log
