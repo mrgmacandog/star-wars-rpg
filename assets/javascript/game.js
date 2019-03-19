@@ -25,22 +25,47 @@
         function restart() {
             // Decalring a new object for each character
             //     Create new characters here
-            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 120, 16, 15);
-            let lukeSkywalker = new Character("luke-skywalker", "Luke Skywalker", 100, 22, 10);
-            let darthSiduous = new Character("darth-siduous", "Darth Siduous", 150, 10, 25);
-            let darthMaul = new Character("darth-maul", "Darth Maul", 180, 4, 30);
+            let hanSolo = new Character("han-solo", "Han Solo", 100, 12, 5);
+            let darthVader = new Character("darth-vader", "Darth Vader", 130, 8, 10);
+            let obiwanKenobi = new Character("obi-won-kenobi", "Obi-Wan Kenobi", 150, 6, 25);
+            let yoda = new Character("yoda", "Yoda", 170, 5, 29);
 
             // Array of characters
             //     Add new characters here
-            characters = [obiwanKenobi, lukeSkywalker, darthSiduous, darthMaul];
+            characters = [hanSolo, darthVader, obiwanKenobi, yoda];
+
+            // Store your-character div
+            let yourCharacter = $("#your-character");
+            // Fade the card out
+            yourCharacter.fadeOut(500, function() {
+                // Empty cards
+                yourCharacter.empty();
+                // Fade the cards in
+                yourCharacter.fadeIn(200);
+            });
+            
+            // Store defender div
+            let defender = $("#defender");
+            // Fade the card out
+            defender.fadeOut(500, function() {
+                // Empty cards
+                defender.empty();
+                // Fade the cards in
+                defender.fadeIn(200);
+            });
+            
+            // Store enemies div
+            let enemies = $("#enemies");
+            // Fade the cards out
+            enemies.fadeOut(500, function() {
+                // Empty cards
+                enemies.empty();
+                // Fade the cards in
+                enemies.fadeIn(200);
+            });
 
             // Create cards for each of the characters
-            createCards()
-
-            // Empty all divs with cards
-            $("#your-character").empty();
-            $("#enemies").empty();
-            $("#defender").empty();
+            createCards();
 
             // Disable the attack button
             $("#attack").attr("disabled", true);
@@ -73,7 +98,7 @@
                 // Create a div for the column
                 let column = $("<div>");
                 // Add the card, col-md-3, and choose-character classes to the div
-                column.addClass("card col-md-3 choose-character");
+                column.addClass("card col-md-3 choose-character hidden");
 
                 // Create a div for the body
                 let body = $("<div>");
@@ -97,7 +122,7 @@
                 image.addClass("card-img-top");
                 // Add source attribute
                 // TEMPORARY SOURCE
-                image.attr("src", "../../01/Basic-Portfolio/assets/images/temp1.jpg");
+                image.attr("src", "assets/images/" + characters[i].id + ".jpg");
                 // Add alt attribute
                 image.attr("alt", characters[i].name);
                 // Append the image to the body
@@ -120,6 +145,7 @@
                 paragraph.append(span);
 
                 $("#characters").append(column);
+                $("#characters > div").fadeIn(500);
             }
         }
         
@@ -194,7 +220,7 @@
         function setEnemyOnClick() {
             // When an enemy is clicked
             $(".choose-enemy").on("click", function() {
-                // Fade out the previosly defeated enemy
+                // Fade out the previously defeated enemy
                 $("#defender > div").fadeOut(500, function(){
                     // Remove defeated defender
                     $("#defender").empty();
@@ -240,7 +266,7 @@
             // Add to defender div
             $("#defender").append(chosenEnemy);
 
-            // Fade in the
+            // Fade in the chosen enemy into the defender div
             chosenEnemy.fadeIn(500);
 
             // Remove choose-enemy class
@@ -337,7 +363,6 @@
 
             // If the defender is dead
             if (isDefenderDead) {
-                
                 // Empty defender's attack log
                 $("#defender-attack").empty();
 
@@ -366,6 +391,7 @@
                     // Remove on click event for last defender
                     $("#defender > div").off("click");
                 }
+
             // If your character is dead
             } else if (isYourCharacterDead) {
                 // Update the attack log
