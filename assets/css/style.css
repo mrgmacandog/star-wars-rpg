@@ -1,3 +1,18 @@
+body {
+    background-image: url("../images/night-sky.jpg");
+    background-size: cover;
+}
+
+.container {
+    background-color: rgba(105, 105, 105, 0.267);
+    padding-left: 3%;
+    padding-right: 3%;
+}
+
+h1, h2, .row > p {
+    color: #fff;
+}
+
 .card {
     text-align: center;
 }
